@@ -1,0 +1,147 @@
+.page {
+  display: flex;
+  height: calc(100vh - 120px); /* Adjust based on topbar/breadcrumbs height */
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--bg-base);
+}
+
+.sidebar {
+  width: 280px;
+  min-width: 200px;
+  max-width: 400px;
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-surface);
+}
+
+.sidebarHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--border);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: var(--bg-elevated);
+}
+
+.headerIcon {
+  color: var(--accent);
+}
+
+.treeContainer {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 4px;
+}
+
+.treeContainer::-webkit-scrollbar {
+  width: 8px;
+}
+.treeContainer::-webkit-scrollbar-track {
+  background: transparent;
+}
+.treeContainer::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: #1e1e1e; /* VS Code dark theme background */
+  overflow: hidden;
+}
+
+.editorContainer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.editorHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  background: #252526;
+  border-bottom: 1px solid #3c3c3c;
+  color: #cccccc;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+}
+
+.editorIcon {
+  color: var(--accent);
+}
+
+.editorPath {
+  opacity: 0.9;
+}
+
+.editorWrapper {
+  flex: 1;
+  position: relative;
+}
+
+.emptyStateContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  background: var(--bg-base);
+}
+
+.loadingBox, .errorBox {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  font-size: 0.85rem;
+}
+
+.loadingBox {
+  color: var(--text-muted);
+}
+
+.errorBox {
+  color: var(--danger);
+  background: var(--danger-subtle);
+  border-bottom: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.loadingBoxMain, .errorBoxMain {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  background: #1e1e1e;
+  color: #cccccc;
+  font-size: 0.9rem;
+  z-index: 10;
+}
+
+.errorBoxMain {
+  color: #f48771;
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+  color: var(--accent);
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

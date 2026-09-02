@@ -1,0 +1,87 @@
+.container {
+  padding: var(--space-2) 0;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  user-select: none;
+}
+
+.empty {
+  padding: var(--space-4);
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.nodeWrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+.node {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  cursor: pointer;
+  color: var(--text-secondary);
+  border-radius: 4px;
+  margin: 1px var(--space-2);
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.node:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.selected {
+  background: var(--accent-subtle);
+  color: var(--accent);
+}
+.selected:hover {
+  background: var(--accent-subtle);
+}
+
+.arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  color: var(--text-muted);
+}
+
+.spacer {
+  width: 16px;
+  height: 16px;
+}
+
+.icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 4px;
+}
+
+.folderIcon {
+  color: var(--accent);
+}
+
+.fileIcon {
+  color: var(--text-muted);
+}
+.selected .fileIcon {
+  color: var(--accent);
+}
+
+.name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.children {
+  display: flex;
+  flex-direction: column;
+}

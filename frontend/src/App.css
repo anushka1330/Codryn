@@ -1,0 +1,27 @@
+/* App-level layout styles */
+
+.app {
+  display: flex;
+  min-height: 100vh;
+  background: var(--bg-base);
+}
+
+.app-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.page-wrapper {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-6);
+}
+
+/* Landing page specific */
+.landing-page {
+  min-height: 100vh;
+  background: var(--bg-base);
+}

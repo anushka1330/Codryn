@@ -1,0 +1,206 @@
+.page {
+  min-height: 100vh;
+  background: var(--bg-base);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-8) var(--space-6);
+  background-image: radial-gradient(ellipse 50% 50% at 50% 0%, rgba(59,130,246,0.06) 0%, transparent 70%);
+}
+
+.inner {
+  width: 100%;
+  max-width: 560px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--text-primary);
+}
+.logoIcon { color: var(--accent); }
+
+.header { }
+.title {
+  font-size: 1.8rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin-bottom: var(--space-2);
+}
+.subtitle {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.form {
+  display: flex;
+  gap: var(--space-3);
+  flex-direction: column;
+}
+.urlInput {
+  position: relative;
+}
+.urlIcon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  pointer-events: none;
+}
+.input {
+  padding-left: 44px !important;
+  height: 48px;
+  font-size: 0.9rem;
+}
+
+.demoBtn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  cursor: pointer;
+  text-align: left;
+  transition: color var(--transition-fast);
+  margin-top: calc(-1 * var(--space-2));
+}
+.demoBtn:hover { color: var(--accent); }
+
+/* STEPS */
+.steps {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+}
+.stepsTitle {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-bottom: var(--space-4);
+}
+.step {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 6px 0;
+}
+.stepIcon {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.stepLabel { font-size: 0.85rem; }
+
+.stepDone   .stepIcon { color: var(--success); }
+.stepDone   .stepLabel { color: var(--text-secondary); }
+.stepActive .stepIcon { color: var(--accent); }
+.stepActive .stepLabel { color: var(--text-primary); font-weight: 500; }
+.stepPending .stepIcon { color: var(--text-muted); }
+.stepPending .stepLabel { color: var(--text-muted); }
+
+.stepDot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--border);
+}
+
+.spin { animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* SUCCESS */
+.success {
+  background: var(--bg-surface);
+  border: 1px solid var(--success);
+  border-radius: var(--radius-xl);
+  padding: var(--space-8);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  animation: fadeIn 300ms ease;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.successIcon { color: var(--success); }
+.successTitle {
+  font-size: 1.3rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.successRepo {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--accent);
+  background: var(--accent-subtle);
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+}
+.successDesc { color: var(--text-muted); font-size: 0.875rem; }
+.successActions {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: var(--space-2);
+}
+
+/* ERROR */
+.errorBox {
+  background: var(--danger-subtle);
+  border: 1px solid rgba(239,68,68,0.3);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4) var(--space-5);
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+.errorIcon { color: var(--danger); flex-shrink: 0; margin-top: 2px; }
+.errorTitle { font-size: 0.875rem; font-weight: 600; color: var(--danger); margin-bottom: 3px; }
+.errorMsg { font-size: 0.82rem; color: var(--text-muted); flex: 1; }
+
+/* EXAMPLES */
+.examples { }
+.examplesLabel {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-bottom: var(--space-2);
+}
+.examplesList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+.exampleBtn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 7px 12px;
+  font-size: 0.8rem;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+  cursor: pointer;
+  text-align: left;
+  transition: all var(--transition-fast);
+}
+.exampleBtn:hover {
+  border-color: var(--accent);
+  color: var(--text-primary);
+  background: var(--bg-elevated);
+}

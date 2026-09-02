@@ -1,0 +1,60 @@
+.card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: border-color var(--transition), box-shadow var(--transition), transform var(--transition);
+}
+
+.card--elevated {
+  background: var(--bg-elevated);
+  box-shadow: var(--shadow);
+}
+
+.card--flat {
+  background: transparent;
+  border-color: var(--border-subtle);
+}
+
+.card--accent {
+  border-color: var(--accent);
+  background: var(--accent-subtle);
+}
+
+.card--hoverable:hover {
+  border-color: var(--border-focus);
+  box-shadow: var(--shadow-accent);
+}
+
+.card--clickable {
+  cursor: pointer;
+}
+.card--clickable:hover {
+  border-color: var(--border-focus);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-accent);
+}
+.card--clickable:active {
+  transform: translateY(0);
+}
+
+.cardHeader {
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.cardBody {
+  padding: var(--space-5);
+}
+
+.cardFooter {
+  padding: var(--space-4) var(--space-5);
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
