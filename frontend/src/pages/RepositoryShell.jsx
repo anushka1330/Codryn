@@ -11,13 +11,50 @@ export default function RepositoryShell() {
   const { repoId } = useParams()
   const navigate = useNavigate()
   const [repository, setRepository] = useState(null)
+  const [analysis, setAnalysis] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [analyzing, setAnalyzing] = useState(false)
   const [error, setError] = useState(null)
 
+  const fetchAnalysis = async (id) => {
+    try {
+      const res = await fetch(`/api/repositories/${id}/analysis`)
+      if (res.ok) {
+        const data = await res.json()
+        setAnalysis(data.analysis || null)
+      } else {
+        setAnalysis(null)
+      }
+    } catch {
+      setAnalysis(null)
+    }
+  }
+
+  const refreshAnalysis = async () => {
+    if (!repository?.id) return
+    try {
+      setAnalyzing(true)
+      const res = await fetch(`/api/repositories/${repository.id}/analyze`, { method: 'POST' })
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        throw new Error(data.error || 'Analysis failed')
+      }
+      await fetchAnalysis(repository.id)
+      const repoRes = await fetch(`/api/repositories/${repository.id}`)
+      if (repoRes.ok) {
+        const repoData = await repoRes.json()
+        if (repoData.repository) setRepository(repoData.repository)
+      }
+    } finally {
+      setAnalyzing(false)
+    }
+  }
+
   useEffect(() => {
-    async function fetchRepository() {
+    async function loadData() {
       try {
         setLoading(true)
+        setError(null)
         const res = await fetch(`/api/repositories/${repoId}`)
         if (!res.ok) {
           if (res.status === 404) {
@@ -28,6 +65,7 @@ export default function RepositoryShell() {
         }
         const data = await res.json()
         setRepository(data.repository)
+        await fetchAnalysis(repoId)
       } catch (err) {
         setError(err.message)
       } finally {
@@ -35,13 +73,13 @@ export default function RepositoryShell() {
       }
     }
 
-    if (repoId) fetchRepository()
+    if (repoId) loadData()
   }, [repoId, navigate])
 
   if (loading) {
     return (
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
-        <LoadingSpinner size="lg" showLabel label="Loading repository..." />
+        <LoadingSpinner size="lg" showLabel label="Loading repository workspace..." />
       </div>
     )
   }
@@ -57,5 +95,12 @@ export default function RepositoryShell() {
     )
   }
 
-  return <AppShell repository={repository} />
+  return (
+    <AppShell
+      repository={repository}
+      analysis={analysis}
+      refreshAnalysis={refreshAnalysis}
+      analyzing={analyzing}
+    />
+  )
 }

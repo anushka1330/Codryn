@@ -12,6 +12,10 @@ export default function Architecture() {
   const [error, setError] = useState(null)
 
   useEffect(() => {
+    document.title = repository?.name ? `Codryn — ${repository.name} Architecture` : 'Codryn — Architecture'
+  }, [repository])
+
+  useEffect(() => {
     async function fetchAnalysis() {
       if (!repository) return
       try {

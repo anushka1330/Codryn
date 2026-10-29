@@ -1,0 +1,40 @@
+.logoLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  text-decoration: none;
+  color: var(--text-primary);
+  transition: opacity var(--transition-fast), transform var(--transition-fast);
+  cursor: pointer;
+  user-select: none;
+}
+
+.logoLink:hover {
+  opacity: 0.92;
+  transform: translateY(-1px);
+}
+
+.iconWrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.text {
+  font-family: var(--font-sans);
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: var(--text-primary);
+  line-height: 1;
+}
+
+/* SIZES */
+.sm .icon { width: 22px; height: 22px; }
+.sm .text { font-size: 0.95rem; }
+
+.md .icon { width: 28px; height: 28px; }
+.md .text { font-size: 1.15rem; }
+
+.lg .icon { width: 36px; height: 36px; }
+.lg .text { font-size: 1.4rem; }

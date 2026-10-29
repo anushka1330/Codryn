@@ -137,3 +137,10 @@
 .resultContent p:last-child {
   margin: 0;
 }
+
+@media (max-width: 640px) {
+  .form {
+    flex-direction: column;
+  }
+}
+

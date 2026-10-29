@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Outlet, useParams } from 'react-router-dom'
+import { Outlet } from 'react-router-dom'
 import Sidebar from './Sidebar'
 import Topbar from './Topbar'
 import Breadcrumbs from './Breadcrumbs'
@@ -11,7 +11,7 @@ import styles from './AppShell.module.css'
  *
  * @param {object} props.repository - current repository data
  */
-export default function AppShell({ repository }) {
+export default function AppShell({ repository, analysis, refreshAnalysis, analyzing }) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
 
@@ -35,12 +35,13 @@ export default function AppShell({ repository }) {
       <div className={styles.main}>
         <Topbar
           repository={repository}
+          analysis={analysis}
           onMenuClick={() => setMobileSidebarOpen(s => !s)}
         />
         <div className={styles.content}>
           <Breadcrumbs repository={repository} />
           <div className={styles.page}>
-            <Outlet context={{ repository }} />
+            <Outlet context={{ repository, analysis, refreshAnalysis, analyzing }} />
           </div>
         </div>
       </div>

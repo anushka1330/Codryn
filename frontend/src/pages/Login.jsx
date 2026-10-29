@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Mail, Lock, Code2, Eye, EyeOff, ArrowRight } from 'lucide-react'
+import { Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react'
 import Button from '../components/ui/Button'
+import Logo from '../components/ui/Logo'
 import styles from './Login.module.css'
 
 export default function Login() {
@@ -11,6 +12,10 @@ export default function Login() {
   const [loading, setLoading] = useState(false)
   const [form, setForm] = useState({ name: '', email: '', password: '' })
   const [error, setError] = useState('')
+
+  useEffect(() => {
+    document.title = mode === 'signin' ? 'Codryn — Sign in' : 'Codryn — Create Account'
+  }, [mode])
 
   function update(field, val) {
     setForm(f => ({ ...f, [field]: val }))
@@ -48,9 +53,8 @@ export default function Login() {
   return (
     <div className={styles.page}>
       <div className={styles.card}>
-        <div className={styles.logo}>
-          <Code2 size={22} className={styles.logoIcon} />
-          <span>Codryn</span>
+        <div className={styles.logoWrapper}>
+          <Logo to="/" size="md" />
         </div>
 
         <h1 className={styles.title}>

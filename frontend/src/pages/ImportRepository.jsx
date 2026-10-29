@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { GitBranch, ArrowRight, CheckCircle, AlertCircle, Loader2, Code2 } from 'lucide-react'
+import { GitBranch, ArrowRight, CheckCircle, AlertCircle, Loader2 } from 'lucide-react'
 import Button from '../components/ui/Button'
+import Logo from '../components/ui/Logo'
 import styles from './ImportRepository.module.css'
 
 const STEPS = [
@@ -23,6 +24,10 @@ export default function ImportRepository() {
   const [currentStep, setCurrentStep] = useState(0)
   const [completedSteps, setCompletedSteps] = useState([])
   const [error, setError] = useState('')
+
+  useEffect(() => {
+    document.title = 'Codryn — Import Repository'
+  }, [])
   const [repository, setRepository] = useState(null)
 
   // Auto-submit if demo param
@@ -42,9 +47,10 @@ export default function ImportRepository() {
     setError('')
     setRepository(null)
 
+    let stepInterval = null
     try {
       // Simulate step progression while request is running
-      const stepInterval = setInterval(() => {
+      stepInterval = setInterval(() => {
         setCurrentStep(prev => {
           if (prev < STEPS.length - 1) {
             setCompletedSteps(c => [...c, prev])
@@ -63,15 +69,25 @@ export default function ImportRepository() {
 
       clearInterval(stepInterval)
 
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Import failed')
+      let data
+      try {
+        data = await res.json()
+      } catch {
+        throw new Error(`Server returned HTTP ${res.status}. Could not parse response.`)
+      }
+
+      if (!res.ok) throw new Error(data?.error || `Import failed (${res.status})`)
 
       setCompletedSteps([0, 1, 2, 3, 4, 5])
       setRepository(data.repository)
       setState('success')
     } catch (err) {
+      if (stepInterval) clearInterval(stepInterval)
       setState('error')
-      setError(err.message)
+      const msg = err.message === 'Failed to fetch'
+        ? 'Could not connect to the backend server. Please verify the API server is running.'
+        : err.message
+      setError(msg)
     }
   }
 
@@ -85,9 +101,8 @@ export default function ImportRepository() {
     <div className={styles.page}>
       <div className={styles.inner}>
         {/* Header */}
-        <div className={styles.logo}>
-          <Code2 size={20} className={styles.logoIcon} />
-          <span>Codryn</span>
+        <div className={styles.logoWrapper}>
+          <Logo to="/repositories" size="md" />
         </div>
 
         <div className={styles.header}>

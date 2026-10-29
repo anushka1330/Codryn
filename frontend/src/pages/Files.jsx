@@ -18,6 +18,10 @@ export default function Files() {
   const [loadingContent, setLoadingContent] = useState(false)
   const [errorContent, setErrorContent] = useState(null)
 
+  useEffect(() => {
+    document.title = repository?.name ? `Codryn — ${repository.name} Files` : 'Codryn — Files'
+  }, [repository])
+
   // Fetch list of files
   useEffect(() => {
     async function loadFiles() {
@@ -132,13 +136,13 @@ export default function Files() {
                 <Editor
                   height="100%"
                   language={getLanguage(selectedFile.fileData?.extension)}
-                  theme="vs-dark"
+                  theme={localStorage.getItem('codryn_editor_theme') || 'vs-dark'}
                   value={fileContent}
                   options={{
                     readOnly: true,
-                    minimap: { enabled: false },
-                    fontSize: 14,
-                    wordWrap: 'on',
+                    minimap: { enabled: localStorage.getItem('codryn_editor_minimap') === 'true' },
+                    fontSize: parseInt(localStorage.getItem('codryn_editor_font_size') || '14', 10),
+                    wordWrap: localStorage.getItem('codryn_editor_word_wrap') || 'on',
                     scrollBeyondLastLine: false,
                     padding: { top: 16 }
                   }}

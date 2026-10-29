@@ -12,6 +12,10 @@ export default function ProjectHealth() {
   const [error, setError] = useState(null)
 
   useEffect(() => {
+    document.title = repository?.name ? `Codryn — ${repository.name} Project Health` : 'Codryn — Project Health'
+  }, [repository])
+
+  useEffect(() => {
     async function fetchAnalysis() {
       if (!repository) return
       try {

@@ -1,15 +1,25 @@
 import { useState, useEffect, useRef } from 'react'
 import { useOutletContext } from 'react-router-dom'
-import { Send, User, MessageSquare, Loader2, AlertCircle } from 'lucide-react'
+import { Send, User, MessageSquare, Loader2, AlertCircle, RotateCcw } from 'lucide-react'
 import { chatService } from '../services/repositoryService'
 import styles from './Chat.module.css'
 
 export default function Chat() {
   const { repository } = useOutletContext() || {}
-  const [messages, setMessages] = useState([])
+  const [messages, setMessages] = useState(() => {
+    if (repository?.full_name) {
+      return [{
+        id: 'welcome',
+        role: 'assistant',
+        content: `Hi! I'm Codryn, your AI assistant for **${repository.full_name}**. Ask me anything about the codebase.`
+      }]
+    }
+    return []
+  })
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
+  const [lastFailedMessage, setLastFailedMessage] = useState(null)
   const [sessionId, setSessionId] = useState(null)
   const messagesEndRef = useRef(null)
 
@@ -19,11 +29,15 @@ export default function Chat() {
 
   useEffect(() => {
     scrollToBottom()
-  }, [messages])
+  }, [messages, loading])
 
-  // Initial welcome message
   useEffect(() => {
-    if (repository && messages.length === 0) {
+    document.title = repository?.name ? `Codryn — ${repository.name} Chat` : 'Codryn — Chat'
+  }, [repository])
+
+  // Set initial message when repository loads if empty
+  useEffect(() => {
+    if (repository?.full_name && messages.length === 0) {
       setMessages([
         {
           id: 'welcome',
@@ -32,42 +46,61 @@ export default function Chat() {
         }
       ])
     }
-  }, [repository, messages.length])
+  }, [repository?.full_name, messages.length])
 
-  const handleSend = async (e) => {
-    e.preventDefault()
-    if (!input.trim() || !repository || loading) return
+  const submitQuestion = async (questionText) => {
+    const text = questionText?.trim()
+    if (!text || !repository?.id || loading) return
 
-    const userMessage = { id: Date.now().toString(), role: 'user', content: input.trim() }
-    setMessages(prev => [...prev, userMessage])
+    const tempUserMessage = { id: `user-${Date.now()}`, role: 'user', content: text }
+    setMessages(prev => [...prev, tempUserMessage])
     setInput('')
     setLoading(true)
     setError(null)
+    setLastFailedMessage(null)
 
     try {
-      const res = await chatService.chat(repository.id, userMessage.content, sessionId)
-      
-      if (!sessionId) {
+      const res = await chatService.chat(repository.id, text, sessionId)
+
+      if (!sessionId && res.session?.id) {
         setSessionId(res.session.id)
       }
 
-      setMessages(res.history.map(msg => ({
-        id: msg.id.toString(),
-        role: msg.role,
-        content: msg.content
-      })))
-
+      if (res.history?.length) {
+        setMessages(res.history.map(msg => ({
+          id: msg.id.toString(),
+          role: msg.role,
+          content: msg.content
+        })))
+      } else if (res.answer) {
+        setMessages(prev => [
+          ...prev,
+          { id: `assistant-${Date.now()}`, role: 'assistant', content: res.answer }
+        ])
+      }
     } catch (err) {
-      setError(err.message)
-      // Remove the optimistic user message if failed
-      setMessages(prev => prev.filter(m => m.id !== userMessage.id))
+      setError(err.message || 'AI generation failed. Please try again.')
+      setLastFailedMessage(text)
+      // Keep optimistic message so the user can see what they asked
     } finally {
       setLoading(false)
     }
   }
 
+  const handleSend = (e) => {
+    e.preventDefault()
+    if (!input.trim() || loading) return
+    submitQuestion(input)
+  }
+
+  const handleRetry = () => {
+    if (!lastFailedMessage || loading) return
+    // Remove the previous optimistic message that failed
+    setMessages(prev => prev.filter(m => m.content !== lastFailedMessage || m.id.startsWith('user-') === false))
+    submitQuestion(lastFailedMessage)
+  }
+
   const formatMessageContent = (content) => {
-    // Very basic markdown formatting for display
     let formatted = content
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
       .replace(/`([^`]+)`/g, '<code>$1</code>')
@@ -92,7 +125,7 @@ export default function Chat() {
               </div>
             </div>
           ))}
-          
+
           {loading && (
             <div className={`${styles.messageWrapper} ${styles.assistantWrapper}`}>
               <div className={styles.avatar}>
@@ -105,11 +138,22 @@ export default function Chat() {
               </div>
             </div>
           )}
-          
+
           {error && (
             <div className={styles.errorBox}>
-              <AlertCircle size={16} />
-              {error}
+              <AlertCircle size={16} style={{ flexShrink: 0 }} />
+              <span>{error}</span>
+              {lastFailedMessage && (
+                <button 
+                  type="button" 
+                  onClick={handleRetry} 
+                  disabled={loading} 
+                  className={styles.retryBtn}
+                >
+                  <RotateCcw size={12} />
+                  Retry
+                </button>
+              )}
             </div>
           )}
           <div ref={messagesEndRef} />

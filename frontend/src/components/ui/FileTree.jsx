@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import { Folder, FolderOpen, FileCode2, File, ChevronRight, ChevronDown } from 'lucide-react'
+import { Folder, FolderOpen, FileCode2, ChevronRight, ChevronDown } from 'lucide-react'
 import styles from './FileTree.module.css'
 
 function FileNode({ node, level = 0, onSelectFile, selectedPath }) {

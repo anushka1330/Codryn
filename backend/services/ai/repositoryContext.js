@@ -24,6 +24,9 @@ function buildRepositoryContext(repository, analysis, files, question = '') {
   if (analysis?.tech_stack) {
     const ts = analysis.tech_stack
     const techItems = []
+    if (ts.languages?.length) {
+      techItems.push(`Languages: ${ts.languages.map(l => l.name ? `${l.name} (${l.fileCount} files)` : l).join(', ')}`)
+    }
     if (ts.frameworks?.length) techItems.push(`Frameworks: ${ts.frameworks.join(', ')}`)
     if (ts.databases?.length)  techItems.push(`Databases: ${ts.databases.join(', ')}`)
     if (ts.orms?.length)       techItems.push(`ORMs: ${ts.orms.join(', ')}`)
@@ -119,7 +122,7 @@ function selectRelevantFiles(files, question) {
   return scored
     .filter(s => s.score > 0)
     .sort((a, b) => b.score - a.score)
-    .slice(0, 8)
+    .slice(0, 4)
     .map(s => s.file)
 }
 

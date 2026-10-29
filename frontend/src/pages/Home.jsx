@@ -1,11 +1,12 @@
 import { useNavigate } from 'react-router-dom'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   GitBranch, Layers, MessageSquare, Zap, Search, Shield,
-  ArrowRight, ChevronRight, Code2, Database,
-  Network, FileCode2, Users, Sparkles, Terminal
+  ArrowRight, ChevronRight, Code2, Network,
+  FileCode2, Users, Sparkles, Terminal, Menu, X
 } from 'lucide-react'
 import Button from '../components/ui/Button'
+import Logo from '../components/ui/Logo'
 import styles from './Home.module.css'
 
 const FEATURES = [
@@ -147,6 +148,11 @@ function CodePreview() {
 export default function Home() {
   const navigate = useNavigate()
   const [url, setUrl] = useState('')
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+
+  useEffect(() => {
+    document.title = 'Codryn — Understand any codebase'
+  }, [])
 
   function handleAnalyze(e) {
     e.preventDefault()
@@ -162,20 +168,42 @@ export default function Home() {
       {/* ── NAV ── */}
       <nav className={styles.nav}>
         <div className={styles.navInner}>
-          <div className={styles.navLogo}>
-            <Code2 size={20} className={styles.navLogoIcon} />
-            <span>Codryn</span>
-          </div>
+          <Logo to="/" size="md" className={styles.navLogo} />
+
           <div className={styles.navLinks}>
             <a href="#how-it-works">How it works</a>
             <a href="#features">Features</a>
             <a href="#preview">Preview</a>
           </div>
+
           <div className={styles.navActions}>
-            <Button variant="ghost" size="sm" onClick={() => navigate('/login')}>Sign in</Button>
+            <Button variant="ghost" size="sm" onClick={() => navigate('/repositories')}>Repositories</Button>
             <Button size="sm" onClick={() => navigate('/repositories/import')}>Get Started</Button>
+            <button
+              type="button"
+              className={styles.mobileToggleBtn}
+              onClick={() => setMobileMenuOpen(prev => !prev)}
+              aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+              id="mobile-nav-toggle"
+            >
+              {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+            </button>
           </div>
         </div>
+
+        {/* Mobile menu dropdown */}
+        {mobileMenuOpen && (
+          <div className={styles.mobileNavDropdown}>
+            <a href="#how-it-works" onClick={() => setMobileMenuOpen(false)}>How it works</a>
+            <a href="#features" onClick={() => setMobileMenuOpen(false)}>Features</a>
+            <a href="#preview" onClick={() => setMobileMenuOpen(false)}>Preview</a>
+            <div className={styles.mobileNavDivider} />
+            <div className={styles.mobileNavButtons}>
+              <Button variant="ghost" size="sm" onClick={() => { setMobileMenuOpen(false); navigate('/repositories') }}>Repositories</Button>
+              <Button size="sm" onClick={() => { setMobileMenuOpen(false); navigate('/repositories/import') }}>Get Started</Button>
+            </div>
+          </div>
+        )}
       </nav>
 
       {/* ── HERO ── */}
@@ -361,11 +389,11 @@ export default function Home() {
       {/* ── FOOTER ── */}
       <footer className={styles.footer}>
         <div className={styles.footerInner}>
-          <div className={styles.footerLogo}>
-            <Code2 size={16} />
-            <span>Codryn</span>
-          </div>
+          <Logo to="/" size="sm" className={styles.footerLogo} />
           <p className={styles.footerTagline}>Understand any codebase.</p>
+          <span className={styles.footerCopy}>
+            © {new Date().getFullYear()} Codryn. All rights reserved.
+          </span>
         </div>
       </footer>
     </div>

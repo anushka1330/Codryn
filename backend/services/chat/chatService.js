@@ -50,10 +50,9 @@ async function processChat({ repositoryId, sessionId, question, userId }) {
   try {
     answer = await generateText(prompt, { maxTokens: 1500 })
   } catch (err) {
-    throw Object.assign(
-      new Error(`AI generation failed: ${err.message}`),
-      { status: 502 }
-    )
+    const error = new Error(err.message || 'AI generation failed. Please try again.')
+    error.status = err.status || 502
+    throw error
   }
 
   // Save messages

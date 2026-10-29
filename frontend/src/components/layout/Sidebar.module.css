@@ -16,21 +16,32 @@
   width: 56px;
 }
 
-.logo {
+.logoHeader {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
+  justify-content: space-between;
   padding: 0 var(--space-4);
   height: var(--topbar-height);
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
 }
-.logoIcon { color: var(--accent); flex-shrink: 0; }
-.logoText {
-  font-size: 1rem;
-  font-weight: 700;
+
+.logo {
+  text-decoration: none;
+}
+
+.mobileCloseBtn {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: var(--radius);
+  transition: color var(--transition-fast);
+}
+.mobileCloseBtn:hover {
   color: var(--text-primary);
-  white-space: nowrap;
 }
 
 .nav {
@@ -116,3 +127,31 @@
   color: var(--text-primary);
   border-color: var(--text-muted);
 }
+
+/* RESPONSIVE MOBILE DRAWER */
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 260px;
+    z-index: 100;
+    transform: translateX(-100%);
+    transition: transform var(--transition);
+    box-shadow: var(--shadow-xl);
+  }
+
+  .sidebarMobileOpen {
+    transform: translateX(0);
+  }
+
+  .mobileCloseBtn {
+    display: inline-flex;
+  }
+
+  .collapseBtn {
+    display: none;
+  }
+}
+

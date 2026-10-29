@@ -3,49 +3,35 @@ import { useOutletContext } from 'react-router-dom'
 import { GitBranch, FileCode2, Clock, Layers, Shield, Activity, Database, Key, Server, Rocket, Loader2, AlertCircle, RefreshCw } from 'lucide-react'
 import Badge from '../components/ui/Badge'
 import Button from '../components/ui/Button'
-import EmptyState from '../components/ui/EmptyState'
+import { useToast } from '../components/ui/Toast'
 import repositoryService from '../services/repositoryService'
 import styles from './RepositoryOverview.module.css'
 
 export default function RepositoryOverview() {
-  const { repository } = useOutletContext() || {}
-  const [analysis, setAnalysis] = useState(null)
-  const [loading, setLoading] = useState(true)
+  const { repository, analysis, refreshAnalysis, analyzing } = useOutletContext() || {}
+  const { toast } = useToast()
   const [error, setError] = useState(null)
-  const [analyzing, setAnalyzing] = useState(false)
-
-  const fetchAnalysis = async () => {
-    if (!repository) return
-    try {
-      setLoading(true)
-      setError(null)
-      const res = await repositoryService.getAnalysis(repository.id)
-      setAnalysis(res.analysis)
-    } catch (err) {
-      if (err.status !== 404) {
-        setError(err.message)
-      } else {
-        setAnalysis(null)
-      }
-    } finally {
-      setLoading(false)
-    }
-  }
 
   useEffect(() => {
-    fetchAnalysis()
+    if (repository?.full_name) {
+      document.title = `Codryn — ${repository.full_name}`
+    } else {
+      document.title = 'Codryn — Repository Overview'
+    }
   }, [repository])
 
   const handleAnalyze = async () => {
     try {
-      setAnalyzing(true)
       setError(null)
-      await repositoryService.analyze(repository.id)
-      await fetchAnalysis()
+      if (refreshAnalysis) {
+        await refreshAnalysis()
+      } else {
+        await repositoryService.analyze(repository.id)
+      }
+      toast('Repository analysis completed successfully!', 'success')
     } catch (err) {
       setError(err.message)
-    } finally {
-      setAnalyzing(false)
+      toast(err.message || 'Analysis failed', 'error')
     }
   }
 
@@ -96,10 +82,10 @@ export default function RepositoryOverview() {
         ))}
       </div>
 
-      {loading ? (
+      {analyzing ? (
         <div className={styles.loadingBox}>
           <Loader2 size={24} className={styles.spinner} />
-          <span>Loading analysis data...</span>
+          <span>Analyzing repository...</span>
         </div>
       ) : !analysis ? (
         <div className={styles.analysisNote}>
@@ -113,11 +99,16 @@ export default function RepositoryOverview() {
             <div className={styles.card}>
               <h3 className={styles.cardTitle}>Tech Stack</h3>
               <div className={styles.tagList}>
+                {analysis.tech_stack.languages?.map(l => (
+                  <span key={l.name || l} className={styles.tag}>
+                    {l.name ? `${l.name} (${l.fileCount} files)` : l}
+                  </span>
+                ))}
                 {analysis.tech_stack.frameworks?.map(f => <span key={f} className={styles.tag}>{f}</span>)}
                 {analysis.tech_stack.databases?.map(d => <span key={d} className={styles.tag}>{d}</span>)}
                 {analysis.tech_stack.uiLibraries?.map(u => <span key={u} className={styles.tag}>{u}</span>)}
                 {analysis.tech_stack.testing?.map(t => <span key={t} className={styles.tag}>{t}</span>)}
-                {(!analysis.tech_stack.frameworks?.length && !analysis.tech_stack.databases?.length) && 
+                {(!analysis.tech_stack.languages?.length && !analysis.tech_stack.frameworks?.length && !analysis.tech_stack.databases?.length) && 
                   <span className={styles.textMuted}>No specific frameworks detected.</span>
                 }
               </div>

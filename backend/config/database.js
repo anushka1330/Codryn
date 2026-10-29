@@ -26,7 +26,7 @@ function getPool() {
       // Parse JSON columns automatically
       typeCast(field, next) {
         if (field.type === 'JSON') {
-          const val = field.string()
+          const val = field.string('utf8')
           try { return val ? JSON.parse(val) : null } catch { return val }
         }
         return next()

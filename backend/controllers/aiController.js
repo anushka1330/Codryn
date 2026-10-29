@@ -1,58 +1,115 @@
 'use strict'
 
+const { traceFeature: runFeatureTrace } = require('../services/tracing/featureTracer')
+const { analyzeChangeImpact: runImpactAnalysis } = require('../services/impact/impactAnalyzer')
 const { generateText, isAvailable } = require('../services/ai/aiClient')
-const { buildRepositoryContext }    = require('../services/ai/repositoryContext')
-const { buildTracePrompt, buildExplainPrompt, buildImpactPrompt } = require('../services/ai/promptBuilder')
+const { buildRepositoryContext } = require('../services/ai/repositoryContext')
+const { buildExplainPrompt } = require('../services/ai/promptBuilder')
 const Repository     = require('../models/Repository')
 const RepositoryFile = require('../models/RepositoryFile')
 const Analysis       = require('../models/Analysis')
 
-async function runTask(req, res, next, taskType) {
+/**
+ * POST /api/repositories/:id/ai/trace
+ */
+async function traceFeature(req, res, next) {
   try {
-    if (!isAvailable()) {
-      return res.status(503).json({ error: 'AI service not configured.' })
-    }
-
     const { id } = req.params
     const { target } = req.body
 
-    if (!target) {
-      return res.status(400).json({ error: 'Target is required.' })
+    if (!target || typeof target !== 'string' || !target.trim()) {
+      return res.status(400).json({ error: 'Target feature description is required.' })
     }
 
-    // Load context
     const repository = await Repository.findById(id)
     if (!repository) return res.status(404).json({ error: 'Repository not found.' })
 
     const analysis = await Analysis.findByRepository(id)
-    const files    = await RepositoryFile.findAllByRepository(id, { withContent: true })
+    const files = await RepositoryFile.findAllByRepository(id, { withContent: true })
 
-    const context = buildRepositoryContext(repository, analysis, files, target)
-    
-    let prompt
-    if (taskType === 'trace') prompt = buildTracePrompt(context, target)
-    else if (taskType === 'impact') prompt = buildImpactPrompt(context, target)
-    else if (taskType === 'explain') prompt = buildExplainPrompt(context, target)
-    else return res.status(400).json({ error: 'Unknown task type' })
+    const result = await runFeatureTrace({
+      repository,
+      analysis,
+      files,
+      target: target.trim(),
+    })
 
-    const result = await generateText(prompt, { maxTokens: 2000 })
-    
     res.json({ result })
   } catch (err) {
     next(err)
   }
 }
 
-async function traceFeature(req, res, next) {
-  return runTask(req, res, next, 'trace')
-}
-
+/**
+ * POST /api/repositories/:id/ai/impact
+ */
 async function changeImpact(req, res, next) {
-  return runTask(req, res, next, 'impact')
+  try {
+    const { id } = req.params
+    const { target } = req.body
+
+    if (!target || typeof target !== 'string' || !target.trim()) {
+      return res.status(400).json({ error: 'Target file or symbol is required.' })
+    }
+
+    const repository = await Repository.findById(id)
+    if (!repository) return res.status(404).json({ error: 'Repository not found.' })
+
+    const analysis = await Analysis.findByRepository(id)
+    const files = await RepositoryFile.findAllByRepository(id, { withContent: true })
+
+    const result = await runImpactAnalysis({
+      repository,
+      analysis,
+      files,
+      target: target.trim(),
+    })
+
+    res.json({ result })
+  } catch (err) {
+    next(err)
+  }
 }
 
+/**
+ * POST /api/repositories/:id/ai/explain
+ */
 async function explainCode(req, res, next) {
-  return runTask(req, res, next, 'explain')
+  try {
+    const { id } = req.params
+    const { target } = req.body
+
+    if (!target || typeof target !== 'string' || !target.trim()) {
+      return res.status(400).json({ error: 'Target code or symbol is required.' })
+    }
+
+    const repository = await Repository.findById(id)
+    if (!repository) return res.status(404).json({ error: 'Repository not found.' })
+
+    const analysis = await Analysis.findByRepository(id)
+    const files = await RepositoryFile.findAllByRepository(id, { withContent: true })
+
+    if (isAvailable()) {
+      try {
+        const context = buildRepositoryContext(repository, analysis, files, target)
+        const prompt = buildExplainPrompt(context, target)
+        const result = await generateText(prompt, { model: 'gemini-3.8-flash', maxTokens: 2000 })
+        return res.json({ result })
+      } catch (err) {
+        console.warn('[explainCode] AI generation failed, using fallback summary:', err.message)
+      }
+    }
+
+    // Fallback explain
+    const matched = files.find(f => f.path.includes(target) || f.name.includes(target))
+    const result = matched
+      ? `### Code Explanation: \`${target}\`\n\nFound matching file \`${matched.path}\` (${matched.language || 'Code'}).\n\n- **Size:** ${matched.size} bytes\n- **Role:** Source module in repository \`${repository.full_name}\`.\n\n*(Static explanation provided while AI service is busy).*`
+      : `### Code Explanation: \`${target}\`\n\nNo file matching \`${target}\` was located in repository \`${repository.full_name}\`.`
+
+    res.json({ result })
+  } catch (err) {
+    next(err)
+  }
 }
 
 module.exports = { traceFeature, changeImpact, explainCode }

@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { ChevronRight, Home } from 'lucide-react'
 import styles from './Breadcrumbs.module.css'
 
@@ -22,13 +22,18 @@ const ROUTE_LABELS = {
 }
 
 export default function Breadcrumbs({ repository }) {
-  // Build crumbs from path segments
+  const location = useLocation()
   const crumbs = []
-  const pathParts = window.location.pathname.split('/').filter(Boolean)
+  const pathParts = location.pathname.split('/').filter(Boolean)
 
   pathParts.forEach((part, i) => {
     const isId = /^\d+$/.test(part) || part.length > 20
-    if (isId) return // skip ID segments
+    if (isId) {
+      if (repository?.name) {
+        crumbs.push({ label: repository.name, path: '/' + pathParts.slice(0, i + 1).join('/') })
+      }
+      return
+    }
 
     const label = ROUTE_LABELS[part] || part
     const path = '/' + pathParts.slice(0, i + 1).join('/')

@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { GitBranch, Plus, Clock, Code2, Star, ArrowRight, Loader2, Search } from 'lucide-react'
+import { GitBranch, Plus, Clock, Code2, ArrowRight, Loader2, Search, AlertCircle } from 'lucide-react'
 import Button from '../components/ui/Button'
 import EmptyState from '../components/ui/EmptyState'
 import Badge from '../components/ui/Badge'
+import Logo from '../components/ui/Logo'
 import styles from './Repositories.module.css'
 
 const STATUS_VARIANT = {
@@ -17,18 +18,26 @@ export default function Repositories() {
   const navigate = useNavigate()
   const [repos, setRepos] = useState([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
   const [search, setSearch] = useState('')
+
+  useEffect(() => {
+    document.title = 'Codryn — Repositories'
+  }, [])
 
   useEffect(() => {
     async function load() {
       try {
+        setError(null)
         const res = await fetch('/api/repositories')
         if (res.ok) {
           const data = await res.json()
           setRepos(data.repositories || [])
+        } else {
+          throw new Error('Unable to fetch repositories')
         }
-      } catch {
-        // silently handle — show empty state
+      } catch (err) {
+        setError(err.message)
       } finally {
         setLoading(false)
       }
@@ -43,6 +52,14 @@ export default function Repositories() {
 
   return (
     <div className={styles.page}>
+      {/* Brand Navigation Bar */}
+      <div className={styles.topNav}>
+        <Logo to="/" size="sm" />
+        <div className={styles.topNavActions}>
+          <Button variant="ghost" size="sm" onClick={() => navigate('/')}>Home</Button>
+        </div>
+      </div>
+
       {/* Header */}
       <div className={styles.header}>
         <div>
@@ -53,6 +70,13 @@ export default function Repositories() {
           Analyze Repository
         </Button>
       </div>
+
+      {error && (
+        <div className={styles.errorBanner}>
+          <AlertCircle size={16} />
+          <span>{error}</span>
+        </div>
+      )}
 
       {/* Search */}
       {repos.length > 0 && (

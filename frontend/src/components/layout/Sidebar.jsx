@@ -1,11 +1,11 @@
-import { useState } from 'react'
 import { NavLink, useParams } from 'react-router-dom'
 import {
-  Code2, LayoutDashboard, FolderTree, Network, Database,
-  Shield, Terminal, Rocket, Server, MessageSquare, Zap,
-  Activity, GitBranch, ChevronRight, ChevronLeft, Layers,
-  Crosshair, Package, Key, Settings
+  LayoutDashboard, FolderTree, Database,
+  Rocket, Server, MessageSquare, Zap,
+  Activity, ChevronRight, ChevronLeft, Layers,
+  Crosshair, Package, Key, Settings, X
 } from 'lucide-react'
+import Logo from '../ui/Logo'
 import styles from './Sidebar.module.css'
 
 const REPOSITORY_NAV = [
@@ -27,7 +27,7 @@ const AI_NAV = [
   { label: 'Project Health',path: 'health',         icon: <Activity size={16} /> },
 ]
 
-export default function Sidebar({ collapsed, onToggle }) {
+export default function Sidebar({ collapsed, onToggle, mobileOpen = false, onMobileClose }) {
   const { repoId } = useParams()
 
   function NavItem({ item }) {
@@ -35,6 +35,7 @@ export default function Sidebar({ collapsed, onToggle }) {
     return (
       <NavLink
         to={base}
+        onClick={() => onMobileClose?.()}
         className={({ isActive }) =>
           `${styles.navItem} ${isActive ? styles.navItemActive : ''} ${collapsed ? styles.navItemCollapsed : ''}`
         }
@@ -46,12 +47,32 @@ export default function Sidebar({ collapsed, onToggle }) {
     )
   }
 
+  const sidebarClasses = [
+    styles.sidebar,
+    collapsed ? styles.sidebarCollapsed : '',
+    mobileOpen ? styles.sidebarMobileOpen : '',
+  ].filter(Boolean).join(' ')
+
   return (
-    <aside className={`${styles.sidebar} ${collapsed ? styles.sidebarCollapsed : ''}`}>
-      {/* Logo */}
-      <div className={styles.logo}>
-        <Code2 size={18} className={styles.logoIcon} />
-        {!collapsed && <span className={styles.logoText}>Codryn</span>}
+    <aside className={sidebarClasses}>
+      {/* Header with Logo & optional Mobile Close */}
+      <div className={styles.logoHeader}>
+        <Logo
+          to="/repositories"
+          size="sm"
+          showText={!collapsed}
+          className={styles.logo}
+        />
+        {mobileOpen && (
+          <button
+            type="button"
+            className={styles.mobileCloseBtn}
+            onClick={onMobileClose}
+            aria-label="Close menu"
+          >
+            <X size={18} />
+          </button>
+        )}
       </div>
 
       <div className={styles.nav}>
@@ -74,7 +95,7 @@ export default function Sidebar({ collapsed, onToggle }) {
         ))}
       </div>
 
-      {/* Collapse toggle */}
+      {/* Collapse toggle (desktop only) */}
       <button
         className={styles.collapseBtn}
         onClick={onToggle}

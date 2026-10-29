@@ -56,6 +56,21 @@
   border-color: var(--border);
 }
 
+.notifWrapper {
+  position: relative;
+}
+
+.badgeDot {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 7px;
+  height: 7px;
+  background: var(--accent);
+  border-radius: 50%;
+  border: 1px solid var(--bg-surface);
+}
+
 .userMenu {
   position: relative;
   margin-left: var(--space-2);
@@ -137,3 +152,29 @@
   background: var(--border-subtle);
   margin: 2px 0;
 }
+
+.menuBtn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text-secondary);
+  cursor: pointer;
+  margin-right: var(--space-2);
+  transition: all var(--transition-fast);
+}
+.menuBtn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+@media (max-width: 768px) {
+  .menuBtn {
+    display: inline-flex;
+  }
+}
+
